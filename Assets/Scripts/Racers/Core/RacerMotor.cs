@@ -141,6 +141,9 @@ public class RacerMotor : MonoBehaviour
 
     private bool useExternalSpacingResolver;
 
+    private bool useDirectSpeedControl;
+    private float directTargetSpeed;
+
     public float NormalizedProgress => normalizedProgress;
     public float CurrentSpeed => currentSpeed;
     public float TargetSpeed => targetSpeed;
@@ -330,6 +333,12 @@ public class RacerMotor : MonoBehaviour
                 amount,
                 -1f,
                 1f);
+    }
+
+    public void SetDirectTargetSpeed(float speed)
+    {
+        useDirectSpeedControl = true;
+        directTargetSpeed = Mathf.Clamp(speed, 0f, maximumSpeed);
     }
 
     public void ChangeLane(int direction)
@@ -526,6 +535,20 @@ public class RacerMotor : MonoBehaviour
 
     private void UpdateSpeed()
     {
+        if (useDirectSpeedControl)
+        {
+            float directRate =
+                currentSpeed < directTargetSpeed
+                    ? acceleration
+                    : deceleration;
+
+            currentSpeed = Mathf.MoveTowards(
+                currentSpeed,
+                directTargetSpeed,
+                directRate * Time.deltaTime);
+
+            return;
+        }
         if (power == null)
         {
             return;
@@ -555,14 +578,6 @@ public class RacerMotor : MonoBehaviour
         }
 
         targetSpeed = CalculateTargetSpeed();
-
-        if (!IsNPCRacer() &&
-            !IsPlayerWheelLocked())
-        {
-            targetSpeed =
-                ApplyFollowSpeedLimit(
-                    targetSpeed);
-        }
 
         float speedChangeRate =
             currentSpeed <
@@ -1016,5 +1031,13 @@ public class RacerMotor : MonoBehaviour
                 clampedDesiredSpeed,
                 Mathf.Max(0f, speedChangePerSecond) *
                 Time.deltaTime);
+    }
+    public void LimitSpeedTo(float maximumSpeed)
+    {
+        float capped = Mathf.Max(0f, maximumSpeed);
+        if (currentSpeed > capped)
+        {
+            currentSpeed = capped;
+        }
     }
 }

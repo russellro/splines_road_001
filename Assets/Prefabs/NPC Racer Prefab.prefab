@@ -258,6 +258,8 @@ MonoBehaviour:
   pelotonReturnOverrideUntil: 0
   decisionInterval: 0.4
   speedTolerance: 0.15
+  speedCorrectionRange: 2
+  speedDamping: 0.25
   currentState: 0
   debugRole: PelotonBody
   debugTargetSpeedFraction: 0

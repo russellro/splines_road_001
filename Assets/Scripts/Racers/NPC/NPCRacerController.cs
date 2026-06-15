@@ -73,6 +73,12 @@ public class NPCRacerController : MonoBehaviour
     [SerializeField, Min(0.05f)] private float decisionInterval = 0.4f;
     [SerializeField, Min(0.01f)] private float speedTolerance = 0.15f;
 
+    [Tooltip("How gently the NPC corrects toward its target speed. Smaller = sharper/more on-off. ~2 m/s eases in smoothly.")]
+    [SerializeField, Min(0.1f)] private float speedCorrectionRange = 2f;
+
+    [Tooltip("Damping that resists rapid speed changes — this is what stops the pulsing. Start at 0.25; raise it if it still hunts.")]
+    [SerializeField, Min(0f)] private float speedDamping = 0.25f;
+
     [Header("Debug")]
     [SerializeField] private TacticState currentState = TacticState.Waiting;
     [SerializeField] private string debugRole = "PelotonBody";
@@ -83,6 +89,8 @@ public class NPCRacerController : MonoBehaviour
     private float nextDecisionTime;
     private float nextLaneChangeTime;
     private float passingUntilTime;
+
+    private float previousSpeed;
 
     public RacerMotor Motor => motor;
 
@@ -277,22 +285,8 @@ public class NPCRacerController : MonoBehaviour
             return;
         }
 
-        float safeSpeedFraction = Mathf.Clamp01(speedFraction);
-        float targetSpeed = motor.MaximumSpeed * safeSpeedFraction;
-
-        if (motor.CurrentSpeed < targetSpeed - speedTolerance)
-        {
-            motor.SetThrottle(1f);
-            return;
-        }
-
-        if (motor.CurrentSpeed > targetSpeed + speedTolerance)
-        {
-            motor.SetThrottle(-1f);
-            return;
-        }
-
-        motor.SetThrottle(0f);
+        float targetSpeed = motor.MaximumSpeed * Mathf.Clamp01(speedFraction);
+        motor.SetDirectTargetSpeed(targetSpeed);
     }
 
     private bool ShouldUrgentlyPassSlowerRider()

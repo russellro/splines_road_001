@@ -178,6 +178,19 @@ public class RaceSpacingResolver : MonoBehaviour
 
             motor.ApplyResolvedMovement(resolvedMove);
 
+            // If we held this rider back, drop its modelled speed to the speed it
+            // was actually allowed to move. Otherwise it keeps pushing faster than
+            // it can travel and lunges forward whenever the gap opens (the rear bob).
+            bool wasHeldBack =
+                leader != null &&
+                resolvedEndDistance < desiredEndDistance - 0.0001f &&
+                Time.deltaTime > 0f;
+
+            if (wasHeldBack)
+            {
+                motor.LimitSpeedTo(resolvedMove / Time.deltaTime);
+            }
+
             leaderResolvedEndDistance = startDistance + resolvedMove;
             leader = motor;
             resolvedRacerCount++;
@@ -193,4 +206,6 @@ public class RaceSpacingResolver : MonoBehaviour
             ? playerMinimumGap
             : npcMinimumGap;
     }
+
+    
 }

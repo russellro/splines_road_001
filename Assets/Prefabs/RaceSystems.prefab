@@ -49,63 +49,11 @@ MonoBehaviour:
   centerMessageText: {fileID: 5099962109922972311}
   timerText: {fileID: 8222681370417808174}
   timeBetweenCountdownNumbers: 1
---- !u!1 &1659835624379345485
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5842506988981942772}
-  - component: {fileID: 2054906467868116564}
-  m_Layer: 0
-  m_Name: PeletonCirculationManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5842506988981942772
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1659835624379345485}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8079525532522074339}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2054906467868116564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1659835624379345485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d018df9265988c46bb55a063565683c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PelotonCirculationManager
-  minimumPullDuration: 7
-  maximumPullDuration: 11
-  retiringDuration: 5
-  pullingSpeedFraction: 0.68
-  advancingSpeedFraction: 0.71
-  retiringSpeedFraction: 0.6
-  frontCandidateCount: 14
-  maximumAdvanceDistance: 18
-  advancingLaneDirection: -1
-  retiringLaneDirection: 1
-  currentPullerName: None
-  advancingRiderName: None
-  retiringRiderName: None
+  startingLineDistance: 0
+  racersPerRow: 4
+  firstGridLane: 0
+  rowSpacing: 2.5
+  firstRowOffset: 0
 --- !u!1 &1844909112625198143
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,6 +101,7 @@ MonoBehaviour:
   playerMotor: {fileID: 0}
   npcRacerPrefab: {fileID: 8066162739422017331, guid: 6e5863d327eb19b428430b83b09c4331, type: 3}
   track: {fileID: 0}
+  raceManager: {fileID: 0}
   totalRacers: 150
   racersPerRow: 4
   startingLineDistance: 0.1
@@ -291,66 +240,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &2047412947427543770
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5481640742605018999}
-  - component: {fileID: 3712448693364488794}
-  m_Layer: 0
-  m_Name: RaceTacticsManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5481640742605018999
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047412947427543770}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8079525532522074339}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3712448693364488794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2047412947427543770}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c376fd5ce5847645bfa04314899af0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RaceTacticsManager
-  refreshInterval: 0.5
-  firstBreakawayDelay: 10
-  chaseGroupDelay: 7
-  breakawayFollowerCount: 3
-  frontCandidateCount: 12
-  minimumBreakawayATP: 0.55
-  breakawayLeaderSpeed: 0.9
-  breakawayFollowerSpeed: 0.84
-  chaseGroupSize: 8
-  chaseGroupSpeed: 0.74
-  pelotonFrontSpeed: 0.68
-  pelotonBodySpeed: 0.62
-  breakawayLeaderName: None
-  currentBreakawaySize: 0
-  currentChaseSize: 0
-  pelotonFrontName: None
 --- !u!1 &2317917158284190425
 GameObject:
   m_ObjectHideFlags: 0
@@ -385,9 +274,6 @@ Transform:
   - {fileID: 5294478667578575441}
   - {fileID: 923506708046590156}
   - {fileID: 6089350933709335030}
-  - {fileID: 6813754941469843493}
-  - {fileID: 5481640742605018999}
-  - {fileID: 5842506988981942772}
   - {fileID: 2407304057770955641}
   - {fileID: 6229597133078886084}
   m_Father: {fileID: 0}
@@ -729,55 +615,6 @@ MonoBehaviour:
   positionSmoothness: 5
   lookOffset: {x: 0, y: 1, z: 3}
   rotationSmoothness: 8
---- !u!1 &6059263750114666666
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6813754941469843493}
-  - component: {fileID: 6487769056145487174}
-  m_Layer: 0
-  m_Name: PeletonManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6813754941469843493
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6059263750114666666}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8079525532522074339}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6487769056145487174
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6059263750114666666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6c3ea07c8752154f80531c6af748a58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PelotonManager
-  refreshInterval: 0.25
-  localPackRadius: 14
-  minimumNeighborsForPack: 3
-  cohesionDistance: 10
-  maximumCohesionAdjustment: 0.12
 --- !u!1001 &3089588472442001330
 PrefabInstance:
   m_ObjectHideFlags: 0

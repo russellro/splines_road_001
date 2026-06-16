@@ -115,6 +115,18 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     [SerializeField, Range(0f, 0.2f)]
     private float cohesionMaxBoost = 0.1f;
 
+    [Header("Lane Spreading")]
+    [Tooltip("Spread pack riders across all lanes so they sit side by side and the bunch is short front-to-back. Requires the riders' returnTowardCenterChance set to 0 so this isn't fought.")]
+    [SerializeField]
+    private bool useLaneSpreading = true;
+
+    [Tooltip("Maximum sideways moves the formation makes per refresh. Low = gentle and stable, higher = spreads faster.")]
+    [SerializeField, Min(1)]
+    private int maxLaneMovesPerRefresh = 3;
+
+    [SerializeField] private int laneMovesThisRefresh;
+    [SerializeField] private int widestLaneRiderCount;
+
     [SerializeField] private NPCRacerController currentFrontRider;
     [SerializeField] private string currentFrontRiderName = "None";
     [SerializeField] private NPCRacerController rotatingOffRider;
@@ -280,6 +292,7 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
         }
 
         UpdateFrontRotation();
+        SpreadPackAcrossLanes();
 
         closingRiderCount = 0;
         largestPackGap = 0f;
@@ -532,6 +545,128 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
         }
 
         return null;
+    }
+
+    // Spreads the pack sideways so riders fill every lane and sit in shared
+    // race-distance bands, which is what lets the closing law pull the bunch short
+    // front-to-back. Riders in an over-full lane step into a less-full neighbour,
+    // rear riders first. A move only happens when it strictly evens the two lanes
+    // (difference of two or more), so the formation settles instead of oscillating.
+    // SetLane is occupancy-checked by RacerAwareness, so a move into a lane with no
+    // room is simply refused and retried next refresh.
+    private void SpreadPackAcrossLanes()
+    {
+        laneMovesThisRefresh = 0;
+        widestLaneRiderCount = 0;
+
+        if (!useLaneSpreading ||
+            mainPack.Count < 2)
+        {
+            return;
+        }
+
+        TrackPath track = null;
+
+        for (int i = 0; i < mainPack.Count; i++)
+        {
+            if (mainPack[i] != null &&
+                mainPack[i].Motor != null &&
+                mainPack[i].Motor.Track != null)
+            {
+                track = mainPack[i].Motor.Track;
+                break;
+            }
+        }
+
+        if (track == null)
+        {
+            return;
+        }
+
+        int laneCount = track.LaneCount;
+
+        if (laneCount < 2)
+        {
+            return;
+        }
+
+        int[] perLaneCount = new int[laneCount];
+
+        for (int i = 0; i < mainPack.Count; i++)
+        {
+            NPCRacerController npc = mainPack[i];
+
+            if (npc == null ||
+                npc.Motor == null)
+            {
+                continue;
+            }
+
+            int lane = track.ClampLane(npc.Motor.CurrentTargetLane);
+            perLaneCount[lane]++;
+        }
+
+        for (int i = 0; i < laneCount; i++)
+        {
+            if (perLaneCount[i] > widestLaneRiderCount)
+            {
+                widestLaneRiderCount = perLaneCount[i];
+            }
+        }
+
+        // mainPack is ordered rear -> front, so this walks rear riders first.
+        for (int i = 0;
+            i < mainPack.Count &&
+            laneMovesThisRefresh < maxLaneMovesPerRefresh;
+            i++)
+        {
+            NPCRacerController npc = mainPack[i];
+
+            if (npc == null ||
+                npc.Motor == null)
+            {
+                continue;
+            }
+
+            int lane = track.ClampLane(npc.Motor.CurrentTargetLane);
+
+            int bestLane = -1;
+            int bestCount = perLaneCount[lane];
+
+            for (int dir = -1; dir <= 1; dir += 2)
+            {
+                int adjacentLane = lane + dir;
+
+                if (adjacentLane < 0 ||
+                    adjacentLane >= laneCount)
+                {
+                    continue;
+                }
+
+                if (perLaneCount[lane] - perLaneCount[adjacentLane] >= 2 &&
+                    perLaneCount[adjacentLane] < bestCount)
+                {
+                    bestLane = adjacentLane;
+                    bestCount = perLaneCount[adjacentLane];
+                }
+            }
+
+            if (bestLane < 0)
+            {
+                continue;
+            }
+
+            npc.Motor.SetLane(bestLane);
+
+            // SetLane only takes effect if the destination lane is clear, so confirm
+            // the rider actually moved before crediting it to the new lane.
+            if (npc.Motor.CurrentTargetLane == bestLane)
+            {
+                perLaneCount[lane]--;
+                perLaneCount[bestLane]++;
+                laneMovesThisRefresh++;
+            }
+        }
     }
 
     private void UpdateFrontRotation()

@@ -252,7 +252,7 @@ MonoBehaviour:
   passChance: 0.295
   passingDuration: 3.5
   laneChangeCooldown: 2
-  returnTowardCenterChance: 0.35
+  returnTowardCenterChance: 0
   pelotonReturnOverrideActive: 0
   pelotonReturnTargetSpeedFraction: 0.35
   pelotonReturnOverrideUntil: 0

@@ -102,6 +102,27 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     [SerializeField, Range(0f, 1f)]
     private float rotateOffSpeed = 0.49f;
 
+    [Header("Cohesion")]
+    [Tooltip("Gently pulls riders that drift back forward to close gaps. Proportional (no on/off threshold), so unlike the old compression it won't surge.")]
+    [SerializeField]
+    private bool useGapClosing = true;
+
+    [Tooltip("Spacing each rider eases toward behind the one ahead. Keep at or above the resolver's NPC min gap.")]
+    [SerializeField, Min(0.5f)]
+    private float cohesionTargetGap = 2f;
+
+    [Tooltip("Speed boost per meter of excess gap, as a fraction of pace. Higher = tighter pack. Lower it if you ever see pulsing.")]
+    [SerializeField, Range(0f, 0.05f)]
+    private float cohesionGain = 0.01f;
+
+    [Tooltip("Cap on the gap-closing boost (fraction of pace).")]
+    [SerializeField, Range(0f, 0.2f)]
+    private float cohesionMaxBoost = 0.06f;
+
+    [Tooltip("How deep the bunch sits behind the leader before riders get pulled forward. Smaller = tighter pack right behind the front.")]
+    [SerializeField, Min(1f)]
+    private float cohesionPackDepth = 8f;
+
     [SerializeField] private NPCRacerController currentFrontRider;
     [SerializeField] private string currentFrontRiderName = "None";
     [SerializeField] private NPCRacerController rotatingOffRider;
@@ -336,6 +357,23 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
             {
                 targetSpeed =
                     compressionSpeed;
+            }
+
+            // Cohesion: pull each rider gently toward the pack's center distance —
+            // smooth and continuous, no on/off cutoff, and the center is a steady
+            // average that doesn't jump, so it can't pump. The leader (exempt) sits
+            // at the front of the bunch this forms.
+            if (useGapClosing &&
+                !isFront &&
+                !isRotatingOff)
+            {
+                float offsetFromCenter =
+                    npc.RaceDistance - PackCenterDistance();
+
+                targetSpeed += Mathf.Clamp(
+                    -cohesionGain * offsetFromCenter,
+                    -cohesionMaxBoost,
+                    cohesionMaxBoost);
             }
 
             npc.SetStrategicOrder(
@@ -755,5 +793,25 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
                 ridersToRemove[i]);
         }
     }
+    private float PackCenterDistance()
+    {
+        if (mainPack == null || mainPack.Count == 0)
+        {
+            return 0f;
+        }
 
+        float sum = 0f;
+        int count = 0;
+
+        for (int i = 0; i < mainPack.Count; i++)
+        {
+            if (mainPack[i] != null)
+            {
+                sum += mainPack[i].RaceDistance;
+                count++;
+            }
+        }
+
+        return count > 0 ? sum / count : 0f;
+    }
 }

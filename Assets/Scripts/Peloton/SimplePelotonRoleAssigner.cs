@@ -45,9 +45,9 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     [SerializeField]
     private bool usePaceRhythm = true;
 
-    [Tooltip("Size of each rider's pace swing as a fraction of pack pace. 0.06 = ±6%. Bigger = more shuffling.")]
+    [Tooltip("Size of each rider's pace swing as a fraction of pack pace. 0.03 = ±3%. Bigger = more shuffling, but keep it below cohesionMaxBoost or the breathing can out-spread the gap closing.")]
     [SerializeField, Range(0f, 0.15f)]
-    private float rhythmAmplitude = 0.06f;
+    private float rhythmAmplitude = 0.03f;
 
     [Tooltip("Shortest personal pace cycle, seconds. Shorter = quicker jockeying.")]
     [SerializeField, Min(2f)]
@@ -56,10 +56,6 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     [Tooltip("Longest personal pace cycle, seconds.")]
     [SerializeField, Min(2f)]
     private float rhythmMaxPeriod = 28f;
-
-    [Tooltip("Front rider should only be slightly faster than the body or they will become an accidental breakaway.")]
-    [SerializeField, Range(0f, 1f)]
-    private float pelotonFrontSpeed = 0.53f;
 
     [Tooltip("Speed used when a rider falls off the back and needs to catch the pack.")]
     [SerializeField, Range(0f, 1f)]
@@ -103,25 +99,21 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     private float rotateOffSpeed = 0.49f;
 
     [Header("Cohesion")]
-    [Tooltip("Gently pulls riders that drift back forward to close gaps. Proportional (no on/off threshold), so unlike the old compression it won't surge.")]
+    [Tooltip("Every non-front rider closes the gap to the rider directly ahead by easing in a speed boost. Proportional (no on/off threshold), so it can't surge.")]
     [SerializeField]
     private bool useGapClosing = true;
 
-    [Tooltip("Spacing each rider eases toward behind the one ahead. Keep at or above the resolver's NPC min gap.")]
+    [Tooltip("Gap each rider holds behind the rider directly ahead. Keep comfortably above the resolver's NPC min gap so riders settle before they hit the resolver's hard floor.")]
     [SerializeField, Min(0.5f)]
     private float cohesionTargetGap = 2f;
 
-    [Tooltip("Speed boost per meter of excess gap, as a fraction of pace. Higher = tighter pack. Lower it if you ever see pulsing.")]
-    [SerializeField, Range(0f, 0.05f)]
-    private float cohesionGain = 0.01f;
+    [Tooltip("Speed boost per metre of excess gap, as a fraction of pace. Higher = tighter, faster-closing pack. Lower it if you see pulsing.")]
+    [SerializeField, Range(0f, 0.1f)]
+    private float cohesionGain = 0.02f;
 
-    [Tooltip("Cap on the gap-closing boost (fraction of pace).")]
+    [Tooltip("Cap on the gap-closing boost (fraction of pace). Keep this above rhythmAmplitude so cohesion always beats the breathing.")]
     [SerializeField, Range(0f, 0.2f)]
-    private float cohesionMaxBoost = 0.06f;
-
-    [Tooltip("How deep the bunch sits behind the leader before riders get pulled forward. Smaller = tighter pack right behind the front.")]
-    [SerializeField, Min(1f)]
-    private float cohesionPackDepth = 8f;
+    private float cohesionMaxBoost = 0.1f;
 
     [SerializeField] private NPCRacerController currentFrontRider;
     [SerializeField] private string currentFrontRiderName = "None";
@@ -131,33 +123,10 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     private float nextFrontRotationTime;
     private float rotatingOffUntil;
 
-    [Header("Rear Pack Compression")]
-    [SerializeField]
-    private bool useRearPackCompression = true;
-
-    [Tooltip("Do not compress using gaps in the first X riders. This protects the front from surging.")]
-    [SerializeField, Min(0)]
-    private int compressionIgnoreFrontCount = 15;
-
-    [Tooltip("Gap size where the rear group starts gently compressing.")]
-    [SerializeField, Min(0f)]
-    private float compressionStartGap = 2.5f;
-
-    [Tooltip("Gap size where the rear group uses the full compression speed.")]
-    [SerializeField, Min(0.1f)]
-    private float compressionFullGap = 10f;
-
-    [Tooltip("Maximum speed used by rear groups to compress gaps. Keep this only slightly above peloton body speed.")]
-    [SerializeField, Range(0f, 1f)]
-    private float compressionMaxSpeed = 0.57f;
-
-    [Tooltip("How quickly compression speed can change. Lower = smoother, higher = more reactive.")]
-    [SerializeField, Min(0f)]
-    private float compressionSpeedChangePerSecond = 0.05f;
-
-    [SerializeField] private int compressingRiderCount;
-    [SerializeField] private string largestCompressionGapBehindName = "None";
-    [SerializeField] private float largestCompressionGap;
+    [Header("Cohesion Debug")]
+    [SerializeField] private int closingRiderCount;
+    [SerializeField] private string largestPackGapBehindName = "None";
+    [SerializeField] private float largestPackGap;
 
     [Header("Debug")]
     [SerializeField] private int detectedNPCCount;
@@ -178,12 +147,6 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
 
     private readonly List<NPCRacerController> mainPack =
         new List<NPCRacerController>();
-
-    private readonly Dictionary<NPCRacerController, float> rearCompressionTargetSpeeds =
-        new Dictionary<NPCRacerController, float>();
-
-    private readonly Dictionary<NPCRacerController, float> smoothedRearCompressionSpeeds =
-        new Dictionary<NPCRacerController, float>();
 
     private float nextRefreshTime;
 
@@ -316,9 +279,16 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
             return;
         }
 
-        UpdateRearPackCompression();
         UpdateFrontRotation();
 
+        closingRiderCount = 0;
+        largestPackGap = 0f;
+        largestPackGapBehindName = "None";
+
+        // mainPack is ordered rear -> front (ascending race distance), so the
+        // rider directly ahead of mainPack[i] is the next one up the list, and the
+        // front of the pack has nobody ahead. That frontmost rider sets a steady
+        // pace; everyone else simply closes the gap to the rider directly ahead.
         for (int i = 0; i < mainPack.Count; i++)
         {
             NPCRacerController npc =
@@ -331,50 +301,83 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
 
             npc.ClearPelotonReturnOverride();
 
+            NPCRacerController globalAhead =
+                RiderAheadInPack(i);
+
+            // Close on the rider directly ahead in the SAME lane so each lane packs
+            // tight, falling back to the nearest rider ahead in any lane (which
+            // pulls a lane-leader up level with the pack front). This lets riders
+            // share race-distance bands across lanes instead of forming one long
+            // single-file staircase, so the bunch is short front-to-back.
+            NPCRacerController riderAhead =
+                SameLaneRiderAhead(
+                    i,
+                    npc.Motor != null
+                        ? npc.Motor.CurrentTargetLane
+                        : int.MinValue)
+                ?? globalAhead;
+
             bool isFront =
                 npc == currentFrontRider;
+
+            // Only the single front-most rider in the whole pack sets the pace;
+            // every lane-leader behind it still closes up onto the front.
+            bool isAnchor =
+                globalAhead == null;
 
             bool isRotatingOff =
                 npc == rotatingOffRider &&
                 Time.time < rotatingOffUntil;
 
-            float targetSpeed =
-                BodyPaceFor(npc);
+            float targetSpeed;
 
-            if (isFront)
+            if (isRotatingOff)
             {
-                targetSpeed =
-                    pelotonFrontSpeed;
+                // Deliberately easing off and peeling aside, so leave it alone and
+                // let it drift back into the pack.
+                targetSpeed = rotateOffSpeed;
             }
-            else if (isRotatingOff)
+            else if (isAnchor)
             {
-                targetSpeed =
-                    rotateOffSpeed;
+                // Front of the pack: a steady pace for everyone behind to reference.
+                // No rhythm here, so the tip of the pack does not wander.
+                targetSpeed = pelotonBodySpeed;
             }
-            else if (rearCompressionTargetSpeeds.TryGetValue(
-                npc,
-                out float compressionSpeed))
+            else
             {
-                targetSpeed =
-                    compressionSpeed;
+                // Pace plus this rider's breathing, then a gap-closing boost scaled
+                // to how far it has drifted behind the rider it is following. The
+                // boost only ever speeds a rider up; the resolver still handles
+                // "too close" by capping forward movement.
+                targetSpeed = BodyPaceFor(npc);
+
+                if (useGapClosing &&
+                    riderAhead != null)
+                {
+                    float gap =
+                        riderAhead.RaceDistance - npc.RaceDistance;
+
+                    float closingBoost =
+                        Mathf.Clamp(
+                            cohesionGain * (gap - cohesionTargetGap),
+                            0f,
+                            cohesionMaxBoost);
+
+                    targetSpeed += closingBoost;
+
+                    if (closingBoost > 0f)
+                    {
+                        closingRiderCount++;
+                    }
+
+                    if (gap > largestPackGap)
+                    {
+                        largestPackGap = gap;
+                        largestPackGapBehindName = npc.name;
+                    }
+                }
             }
 
-            // Cohesion: pull each rider gently toward the pack's center distance —
-            // smooth and continuous, no on/off cutoff, and the center is a steady
-            // average that doesn't jump, so it can't pump. The leader (exempt) sits
-            // at the front of the bunch this forms.
-            if (useGapClosing &&
-                !isFront &&
-                !isRotatingOff)
-            {
-                float offsetFromCenter =
-                    npc.RaceDistance - PackCenterDistance();
-
-                targetSpeed += Mathf.Clamp(
-                    -cohesionGain * offsetFromCenter,
-                    -cohesionMaxBoost,
-                    cohesionMaxBoost);
-            }
 
             npc.SetStrategicOrder(
                 isFront
@@ -464,6 +467,71 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     {
         float value = Mathf.Sin(seed * 12.9898f) * 43758.5453f;
         return value - Mathf.Floor(value);
+    }
+
+    // The rider directly ahead of mainPack[index] in race order. The rotating-off
+    // rider is skipped: it has peeled aside on purpose, so riders behind it should
+    // close on whoever is genuinely leading rather than pace off a rider that is
+    // easing back and changing lanes. Returns null for the front of the pack.
+    private NPCRacerController RiderAheadInPack(int index)
+    {
+        bool rotatingActive =
+            rotatingOffRider != null &&
+            Time.time < rotatingOffUntil;
+
+        for (int j = index + 1; j < mainPack.Count; j++)
+        {
+            NPCRacerController candidate = mainPack[j];
+
+            if (candidate == null)
+            {
+                continue;
+            }
+
+            if (rotatingActive &&
+                candidate == rotatingOffRider)
+            {
+                continue;
+            }
+
+            return candidate;
+        }
+
+        return null;
+    }
+
+    // The nearest rider ahead of mainPack[index] that is in the same target lane.
+    // Same skip rules as RiderAheadInPack. Returns null when this rider is the
+    // front of its lane (the caller then falls back to the global rider ahead).
+    private NPCRacerController SameLaneRiderAhead(int index, int lane)
+    {
+        bool rotatingActive =
+            rotatingOffRider != null &&
+            Time.time < rotatingOffUntil;
+
+        for (int j = index + 1; j < mainPack.Count; j++)
+        {
+            NPCRacerController candidate = mainPack[j];
+
+            if (candidate == null ||
+                candidate.Motor == null)
+            {
+                continue;
+            }
+
+            if (rotatingActive &&
+                candidate == rotatingOffRider)
+            {
+                continue;
+            }
+
+            if (candidate.Motor.CurrentTargetLane == lane)
+            {
+                return candidate;
+            }
+        }
+
+        return null;
     }
 
     private void UpdateFrontRotation()
@@ -610,208 +678,4 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
             Time.time + frontRotationInterval;
     }
 
-    private void UpdateRearPackCompression()
-    {
-        rearCompressionTargetSpeeds.Clear();
-
-        compressingRiderCount = 0;
-        largestCompressionGapBehindName = "None";
-        largestCompressionGap = 0f;
-
-        if (!useRearPackCompression ||
-            mainPack == null ||
-            mainPack.Count <= compressionIgnoreFrontCount + 1)
-        {
-            smoothedRearCompressionSpeeds.Clear();
-            return;
-        }
-
-        List<NPCRacerController> sortedFrontToRear =
-            new List<NPCRacerController>();
-
-        for (int i = 0; i < mainPack.Count; i++)
-        {
-            if (mainPack[i] != null)
-            {
-                sortedFrontToRear.Add(mainPack[i]);
-            }
-        }
-
-        sortedFrontToRear.Sort(
-            (a, b) => b.RaceDistance.CompareTo(a.RaceDistance));
-
-        Dictionary<NPCRacerController, float> desiredSpeeds =
-            new Dictionary<NPCRacerController, float>();
-
-        for (int i = compressionIgnoreFrontCount;
-            i < sortedFrontToRear.Count;
-            i++)
-        {
-            NPCRacerController riderAhead =
-                sortedFrontToRear[i - 1];
-
-            NPCRacerController firstRiderBehindGap =
-                sortedFrontToRear[i];
-
-            if (riderAhead == null ||
-                firstRiderBehindGap == null)
-            {
-                continue;
-            }
-
-            float gap =
-                riderAhead.RaceDistance -
-                firstRiderBehindGap.RaceDistance;
-
-            if (gap > largestCompressionGap)
-            {
-                largestCompressionGap =
-                    gap;
-
-                largestCompressionGapBehindName =
-                    firstRiderBehindGap.name;
-            }
-
-            if (gap <= compressionStartGap)
-            {
-                continue;
-            }
-
-            float gap01 =
-                Mathf.InverseLerp(
-                    compressionStartGap,
-                    compressionFullGap,
-                    gap);
-
-            float desiredCompressionSpeed =
-                Mathf.Lerp(
-                    pelotonBodySpeed,
-                    compressionMaxSpeed,
-                    gap01);
-
-            desiredCompressionSpeed =
-                Mathf.Clamp(
-                    desiredCompressionSpeed,
-                    pelotonBodySpeed,
-                    compressionMaxSpeed);
-
-            // Rear-pack compression: everyone behind this gap gets the same
-            // gentle speed increase. This closes the hole as a group instead
-            // of launching one rider forward and causing accordion motion.
-            for (int j = i; j < sortedFrontToRear.Count; j++)
-            {
-                NPCRacerController rearGroupRider =
-                    sortedFrontToRear[j];
-
-                if (rearGroupRider == null)
-                {
-                    continue;
-                }
-
-                if (!desiredSpeeds.TryGetValue(
-                        rearGroupRider,
-                        out float existingSpeed) ||
-                    desiredCompressionSpeed > existingSpeed)
-                {
-                    desiredSpeeds[rearGroupRider] =
-                        desiredCompressionSpeed;
-                }
-            }
-        }
-
-        HashSet<NPCRacerController> allRidersToUpdate =
-            new HashSet<NPCRacerController>();
-
-        foreach (NPCRacerController rider in desiredSpeeds.Keys)
-        {
-            allRidersToUpdate.Add(rider);
-        }
-
-        foreach (NPCRacerController rider in smoothedRearCompressionSpeeds.Keys)
-        {
-            allRidersToUpdate.Add(rider);
-        }
-
-        List<NPCRacerController> ridersToRemove =
-            new List<NPCRacerController>();
-
-        float smoothingStep =
-            compressionSpeedChangePerSecond *
-            refreshInterval;
-
-        foreach (NPCRacerController rider in allRidersToUpdate)
-        {
-            if (rider == null ||
-                !mainPack.Contains(rider))
-            {
-                ridersToRemove.Add(rider);
-                continue;
-            }
-
-            float desiredSpeed =
-                desiredSpeeds.TryGetValue(
-                    rider,
-                    out float storedDesiredSpeed)
-                    ? storedDesiredSpeed
-                    : pelotonBodySpeed;
-
-            float previousSpeed =
-                smoothedRearCompressionSpeeds.TryGetValue(
-                    rider,
-                    out float storedPreviousSpeed)
-                    ? storedPreviousSpeed
-                    : pelotonBodySpeed;
-
-            float smoothedSpeed =
-                Mathf.MoveTowards(
-                    previousSpeed,
-                    desiredSpeed,
-                    smoothingStep);
-
-            if (desiredSpeed <= pelotonBodySpeed &&
-                Mathf.Abs(smoothedSpeed - pelotonBodySpeed) < 0.001f)
-            {
-                ridersToRemove.Add(rider);
-                continue;
-            }
-
-            smoothedRearCompressionSpeeds[rider] =
-                smoothedSpeed;
-
-            if (smoothedSpeed > pelotonBodySpeed + 0.001f)
-            {
-                rearCompressionTargetSpeeds[rider] =
-                    smoothedSpeed;
-
-                compressingRiderCount++;
-            }
-        }
-
-        for (int i = 0; i < ridersToRemove.Count; i++)
-        {
-            smoothedRearCompressionSpeeds.Remove(
-                ridersToRemove[i]);
-        }
-    }
-    private float PackCenterDistance()
-    {
-        if (mainPack == null || mainPack.Count == 0)
-        {
-            return 0f;
-        }
-
-        float sum = 0f;
-        int count = 0;
-
-        for (int i = 0; i < mainPack.Count; i++)
-        {
-            if (mainPack[i] != null)
-            {
-                sum += mainPack[i].RaceDistance;
-                count++;
-            }
-        }
-
-        return count > 0 ? sum / count : 0f;
-    }
 }

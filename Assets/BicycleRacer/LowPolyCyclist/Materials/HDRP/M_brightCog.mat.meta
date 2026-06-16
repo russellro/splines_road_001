@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7d4aafb978854ad44a51acc94edacb37
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/HDRP/M_brightCog.mat
+  uploadId: 406147

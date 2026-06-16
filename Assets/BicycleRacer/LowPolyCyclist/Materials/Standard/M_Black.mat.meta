@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a9926b64bdec75f43acf6d955444221a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/Standard/M_Black.mat
+  uploadId: 406147

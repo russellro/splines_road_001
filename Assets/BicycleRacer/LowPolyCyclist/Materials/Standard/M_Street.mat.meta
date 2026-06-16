@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a23408719d42d9d4b8ae600f06f46024
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/Standard/M_Street.mat
+  uploadId: 406147

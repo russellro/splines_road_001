@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4071218e13324bf4e95487e29c63242a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/HDRP/M_Handle.mat
+  uploadId: 406147

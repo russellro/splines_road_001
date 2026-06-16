@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fd1092d40595ab248b5379966d0ecc32
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/Standard/M_Skin.mat
+  uploadId: 406147

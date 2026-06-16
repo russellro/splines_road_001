@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 587eec4fb2af00145a37a12dcf16f8c8
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Prefabs/Cyclist_HDRP.prefab
+  uploadId: 406147

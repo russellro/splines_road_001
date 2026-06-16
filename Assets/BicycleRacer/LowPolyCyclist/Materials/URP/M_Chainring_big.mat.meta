@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 92b8f0814e489114ea414f06b7d27c4b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/URP/M_Chainring_big.mat
+  uploadId: 406147

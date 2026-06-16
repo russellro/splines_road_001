@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e8c6e5b5a63b08248ad5f88fecfb506a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/URP/M_TeamColor.mat
+  uploadId: 406147

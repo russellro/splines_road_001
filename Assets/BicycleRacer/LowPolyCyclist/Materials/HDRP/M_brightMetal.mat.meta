@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: dbeb169bbd13e6a4994b034217f524e5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/HDRP/M_brightMetal.mat
+  uploadId: 406147

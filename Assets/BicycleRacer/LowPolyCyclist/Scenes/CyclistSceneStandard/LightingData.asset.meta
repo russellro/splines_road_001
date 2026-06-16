@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 256cf653c4aa16243b17842734616fbd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Scenes/CyclistSceneStandard/LightingData.asset
+  uploadId: 406147

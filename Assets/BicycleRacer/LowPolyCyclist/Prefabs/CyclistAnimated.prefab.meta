@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 610556407e22a9645a7d58137f64f1b7
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Prefabs/CyclistAnimated.prefab
+  uploadId: 406147

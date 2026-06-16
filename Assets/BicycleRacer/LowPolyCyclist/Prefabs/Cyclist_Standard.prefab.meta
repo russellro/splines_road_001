@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: bd963b08a35788443b90d4239b63d58e
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Prefabs/Cyclist_Standard.prefab
+  uploadId: 406147

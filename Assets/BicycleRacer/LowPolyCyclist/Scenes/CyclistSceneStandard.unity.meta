@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c795a449d1cba1a458f43b047a2935a7
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Scenes/CyclistSceneStandard.unity
+  uploadId: 406147

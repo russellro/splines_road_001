@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5b2a54d833b07ee4997e7f5a0da28915
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/Standard/M_brightMetal.mat
+  uploadId: 406147

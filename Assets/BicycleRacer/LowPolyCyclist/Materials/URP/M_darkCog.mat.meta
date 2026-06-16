@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 83c98b417182cef46a3131f553267d95
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 184962
+  packageName: Low Poly Cyclist
+  packageVersion: 1.0
+  assetPath: Assets/MattUtils/LowPolyCyclist/Materials/URP/M_darkCog.mat
+  uploadId: 406147

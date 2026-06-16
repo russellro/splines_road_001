@@ -40,6 +40,23 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     [SerializeField, Range(0f, 1f)]
     private float pelotonBodySpeed = 0.52f;
 
+    [Header("Pace Rhythm")]
+    [Tooltip("Per-rider pace variation so the pack breathes and riders shuffle. Open-loop (no feedback), so it can't oscillate.")]
+    [SerializeField]
+    private bool usePaceRhythm = true;
+
+    [Tooltip("Size of each rider's pace swing as a fraction of pack pace. 0.06 = ±6%. Bigger = more shuffling.")]
+    [SerializeField, Range(0f, 0.15f)]
+    private float rhythmAmplitude = 0.06f;
+
+    [Tooltip("Shortest personal pace cycle, seconds. Shorter = quicker jockeying.")]
+    [SerializeField, Min(2f)]
+    private float rhythmMinPeriod = 12f;
+
+    [Tooltip("Longest personal pace cycle, seconds.")]
+    [SerializeField, Min(2f)]
+    private float rhythmMaxPeriod = 28f;
+
     [Tooltip("Front rider should only be slightly faster than the body or they will become an accidental breakaway.")]
     [SerializeField, Range(0f, 1f)]
     private float pelotonFrontSpeed = 0.53f;
@@ -55,6 +72,16 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
     [Header("Front Rotation")]
     [SerializeField]
     private bool useFrontRotation = true;
+
+    [Tooltip("Pull the rotating-off leader out to the side so the next rider comes through.")]
+    [SerializeField]
+    private bool peelOffOnRotation = true;
+
+    [Tooltip("How many lanes the rotating-off leader pulls aside.")]
+    [SerializeField, Range(1, 3)]
+    private int rotationPeelLanes = 2;
+
+    private int peelSign = 1;
 
     [SerializeField, Min(1f)]
     private float frontRotationInterval = 8f;
@@ -291,7 +318,7 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
                 Time.time < rotatingOffUntil;
 
             float targetSpeed =
-                pelotonBodySpeed;
+                BodyPaceFor(npc);
 
             if (isFront)
             {
@@ -370,11 +397,35 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
 
             npc.SetStrategicOrder(
                 NPCRacerController.StrategicRole.PelotonBody,
-                pelotonBodySpeed,
+                BodyPaceFor(npc),
                 false);
 
             pelotonBodyCount++;
         }
+    }
+
+    // Normal pack pace plus this rider's personal slow rhythm. Each rider gets a
+    // stable random period/phase from its ID, so they breathe out of phase with
+    // each other and continuously shuffle. Zero-mean, so the pack holds together.
+    private float BodyPaceFor(NPCRacerController npc)
+    {
+        if (!usePaceRhythm || npc == null || rhythmAmplitude <= 0f)
+        {
+            return pelotonBodySpeed;
+        }
+
+        int id = npc.GetInstanceID();
+        float period = Mathf.Lerp(rhythmMinPeriod, rhythmMaxPeriod, Hash01(id));
+        float phase = Hash01(id * 7 + 11) * (Mathf.PI * 2f);
+        float wave = Mathf.Sin(Time.time * (Mathf.PI * 2f / period) + phase); // -1..1
+
+        return pelotonBodySpeed * (1f + rhythmAmplitude * wave);
+    }
+
+    private static float Hash01(int seed)
+    {
+        float value = Mathf.Sin(seed * 12.9898f) * 43758.5453f;
+        return value - Mathf.Floor(value);
     }
 
     private void UpdateFrontRotation()
@@ -476,6 +527,15 @@ public class SimplePelotonRoleAssigner : MonoBehaviour
 
         rotatingOffUntil =
             Time.time + rotateOffDuration;
+        if (peelOffOnRotation &&
+            rotatingOffRider != null)
+        {
+            rotatingOffRider.StepAside(
+                peelSign,
+                rotationPeelLanes);
+
+            peelSign = -peelSign;
+        }
 
         rotatingOffRiderName =
             rotatingOffRider != null

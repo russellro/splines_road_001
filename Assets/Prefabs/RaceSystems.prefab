@@ -49,11 +49,6 @@ MonoBehaviour:
   centerMessageText: {fileID: 5099962109922972311}
   timerText: {fileID: 8222681370417808174}
   timeBetweenCountdownNumbers: 1
-  startingLineDistance: 0
-  racersPerRow: 4
-  firstGridLane: 0
-  rowSpacing: 2.5
-  firstRowOffset: 0
 --- !u!1 &1844909112625198143
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,7 +606,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollower
   target: {fileID: 6229597133078886084}
-  offset: {x: 0, y: 4, z: -8}
+  offset: {x: 0, y: 4, z: -4}
   positionSmoothness: 5
   lookOffset: {x: 0, y: 1, z: 3}
   rotationSmoothness: 8

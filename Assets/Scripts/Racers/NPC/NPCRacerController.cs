@@ -380,6 +380,24 @@ public class NPCRacerController : MonoBehaviour
         TryEnterLane(currentLane + direction);
     }
 
+    // Pull out to the side (forced — ignores occupancy) so the rider behind can
+    // come through. Used when this rider rotates off the front of the pack.
+    public void StepAside(int direction, int lanes)
+    {
+        if (motor == null)
+        {
+            return;
+        }
+
+        int step = direction >= 0 ? 1 : -1;
+        int count = Mathf.Max(1, lanes);
+
+        for (int i = 0; i < count; i++)
+        {
+            motor.ForceLaneShift(step);
+        }
+    }
+
     private void UpdateDebugFields()
     {
         debugRole = strategicRole.ToString();

@@ -188,7 +188,11 @@ public class RaceSpacingResolver : MonoBehaviour
 
             if (wasHeldBack)
             {
-                motor.LimitSpeedTo(resolvedMove / Time.deltaTime);
+                // Match the rider ahead's pace, not the distance we were allowed
+                // this frame. The latter is zero when a rider is wedged in (e.g.
+                // just pushed), which drops it to a dead stop and stalls everyone
+                // behind it.
+                motor.LimitSpeedTo(leader.CurrentSpeed);
             }
 
             leaderResolvedEndDistance = startDistance + resolvedMove;

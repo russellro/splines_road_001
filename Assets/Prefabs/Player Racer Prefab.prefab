@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7938631488261753213
 Transform:
   m_ObjectHideFlags: 0
@@ -150,6 +150,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7938631488261753213}
+  - {fileID: 2543287981363768535}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5588421667542737212
@@ -168,27 +169,29 @@ MonoBehaviour:
   track: {fileID: 0}
   power: {fileID: 0}
   energy: {fileID: 6666804024138176981}
+  usePlayerEnergySystem: 1
   startingSpeed: 4
   maximumSpeed: 50
   acceleration: 4
   deceleration: 6
   minimumRollingSpeedFraction: 0.05
+  wattsToSpeedExponent: 1
   maximumSimulatedUphillGrade: 16
   maximumSimulatedDownhillGrade: 12
   minimumClimbingSpeedFraction: 0.1
-  wattsToSpeedExponent: 1
   uphillSpeedPenaltyPerGradePercent: 0.045
   downhillSpeedBonusPerGradePercent: 0.025
-  draftingSpeedBonusFraction: 0.035
   maximumDownhillSpeedMultiplier: 1.15
   exhaustedSpeed: 2
   exhaustionDeceleration: 6
   exhaustedWattsPercent: 20
   startingLane: 3
   laneChangeSpeed: 5
+  raceStartLaneLockDuration: 2
   swimmingLaneChangeSpeedMultiplier: 2.2
   awareness: {fileID: 525771229129358253}
   draftingATPMultiplier: 0.7
+  latchDraftingWattsReduction: 0
   startingLineDistance: 0.1
   startingGridOffset: 0
 --- !u!114 &4370429566163343035
@@ -237,6 +240,7 @@ MonoBehaviour:
   maximumDrainPerSecond: 20
   exertionExponent: 1
   uphillDrainMultiplierPerGradePercent: 0.035
+  draftingEffortMultiplier: 0.7
   recoveryWattsThreshold: 0.4
   recoveryPerSecond: 4
   draftingRecoveryMultiplier: 1.25
@@ -283,3 +287,65 @@ MonoBehaviour:
   wedgeWidth: 8
   pushCooldown: 0.25
   lastPush: None
+--- !u!1001 &5957597018115482091
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 8976683196841812342}
+    m_Modifications:
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8839968696353314694, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+      propertyPath: m_Name
+      value: Cyclist_URP
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+--- !u!4 &2543287981363768535 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8207300275950980412, guid: 464a71d8cf964e34d8a605891b2c671c, type: 3}
+  m_PrefabInstance: {fileID: 5957597018115482091}
+  m_PrefabAsset: {fileID: 0}

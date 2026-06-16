@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5809832191713351853
 Transform:
   m_ObjectHideFlags: 0
@@ -150,6 +150,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5809832191713351853}
+  - {fileID: 2811682108150119317}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8066162739422017331
@@ -294,3 +295,65 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RacerDebugProbe
   debugReadout: 
   refreshInterval: 0.2
+--- !u!1001 &6260893979435202217
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3889349916972602726}
+    m_Modifications:
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8839968696353314694, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+      propertyPath: m_Name
+      value: Cyclist_URP NPC
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+--- !u!4 &2811682108150119317 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8207300275950980412, guid: ab127a41235b6ce4a8cae5bfd3d5e4a0, type: 3}
+  m_PrefabInstance: {fileID: 6260893979435202217}
+  m_PrefabAsset: {fileID: 0}

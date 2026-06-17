@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 525771229129358253}
   - component: {fileID: 4965185395487076535}
   - component: {fileID: 6984835143663070046}
+  - component: {fileID: 3375650507045930838}
   m_Layer: 0
   m_Name: Player Racer Prefab
   m_TagString: Untagged
@@ -238,13 +239,33 @@ MonoBehaviour:
   maximumATP: 1000
   startingATP: 1000
   bonkThreshold: 100
-  maximumDrainPerSecond: 20
-  exertionExponent: 1
-  uphillDrainMultiplierPerGradePercent: 0.035
-  draftingEffortMultiplier: 0.7
-  recoveryWattsThreshold: 0.4
-  recoveryPerSecond: 4
+  zones:
+  - label: Recover
+    effort: 0.35
+    atpPerSecond: 12
+  - label: Endurance
+    effort: 0.5
+    atpPerSecond: 6
+  - label: Tempo
+    effort: 0.62
+    atpPerSecond: 2
+  - label: Threshold
+    effort: 0.74
+    atpPerSecond: -4
+  - label: VO2 Max
+    effort: 0.84
+    atpPerSecond: -12
+  - label: Anaerobic
+    effort: 0.93
+    atpPerSecond: -24
+  - label: Sprint
+    effort: 1
+    atpPerSecond: -45
+  startingZoneIndex: 1
+  draftingDrainMultiplier: 0.7
   draftingRecoveryMultiplier: 1.25
+  uphillDrainMultiplierPerGradePercent: 0.035
+  effortSmoothing: 0.15
 --- !u!114 &525771229129358253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -303,6 +324,24 @@ MonoBehaviour:
   teamColorMaterial: {fileID: 0}
   color: {r: 0.5847869, g: 0.7732068, b: 0.8050314, a: 1}
   colorProperty: _BaseColor
+--- !u!114 &3375650507045930838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3683038308582918971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92f33c25e67793f47b994d85ae856500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RacerEffortInput
+  arrowZoneCount: 6
+  startingZoneIndex: 1
+  sprintZoneIndex: 6
+  zoneUpKey: 273
+  zoneDownKey: 274
+  sprintKey: 32
 --- !u!1001 &3409711894714163860
 PrefabInstance:
   m_ObjectHideFlags: 0

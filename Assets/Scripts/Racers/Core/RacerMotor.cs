@@ -266,7 +266,6 @@ public class RacerMotor : MonoBehaviour
         UpdatePower();
         LatchDraftingWattsReduction();
         UpdateSpeed();
-        //ApplyFollowingSpeedLimit();
         UpdateEnergy();
 
         if (!useExternalSpacingResolver)
@@ -537,14 +536,17 @@ public class RacerMotor : MonoBehaviour
     {
         if (useDirectSpeedControl)
         {
+            float limitedDirectSpeed =
+                ApplyFollowSpeedLimit(directTargetSpeed);   // add this
+
             float directRate =
-                currentSpeed < directTargetSpeed
+                currentSpeed < limitedDirectSpeed
                     ? acceleration
                     : deceleration;
 
             currentSpeed = Mathf.MoveTowards(
                 currentSpeed,
-                directTargetSpeed,
+                limitedDirectSpeed,   // was directTargetSpeed
                 directRate * Time.deltaTime);
 
             return;
@@ -649,28 +651,6 @@ public class RacerMotor : MonoBehaviour
 
         return maximumSpeed *
             targetSpeedFraction;
-    }
-
-    private void ApplyFollowingSpeedLimit()
-    {
-        if (awareness == null ||
-            !awareness.HasRacerAhead ||
-            awareness.RacerAhead == null)
-        {
-            return;
-        }
-
-        if (awareness.DistanceToRacerAhead >
-            awareness.MinimumFollowingDistance +
-            0.15f)
-        {
-            return;
-        }
-
-        currentSpeed =
-            Mathf.Min(
-                currentSpeed,
-                awareness.RacerAhead.CurrentSpeed);
     }
 
     private void UpdateEnergy()

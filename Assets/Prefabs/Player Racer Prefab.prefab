@@ -171,13 +171,14 @@ MonoBehaviour:
   track: {fileID: 0}
   power: {fileID: 0}
   energy: {fileID: 6666804024138176981}
+  effortInput: {fileID: 0}
   usePlayerEnergySystem: 1
   startingSpeed: 4
   maximumSpeed: 50
   acceleration: 4
   deceleration: 6
   minimumRollingSpeedFraction: 0.05
-  wattsToSpeedExponent: 1
+  wattsToSpeedExponent: 2
   maximumSimulatedUphillGrade: 16
   maximumSimulatedDownhillGrade: 12
   minimumClimbingSpeedFraction: 0.1
@@ -262,7 +263,7 @@ MonoBehaviour:
     effort: 1
     atpPerSecond: -45
   startingZoneIndex: 1
-  draftingDrainMultiplier: 0.7
+  draftingDrainMultiplier: 0.548
   draftingRecoveryMultiplier: 1.25
   uphillDrainMultiplierPerGradePercent: 0.035
   effortSmoothing: 0.15
@@ -339,9 +340,6 @@ MonoBehaviour:
   arrowZoneCount: 6
   startingZoneIndex: 1
   sprintZoneIndex: 6
-  zoneUpKey: 273
-  zoneDownKey: 274
-  sprintKey: 32
 --- !u!1001 &3409711894714163860
 PrefabInstance:
   m_ObjectHideFlags: 0

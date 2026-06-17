@@ -16,6 +16,10 @@ public class RacerMotor : MonoBehaviour
     [Tooltip("Only the player should use RacerEnergy. NPC racers ignore this even if the component exists.")]
     [SerializeField] private RacerEnergy energy;
 
+    [Tooltip("Player input that selects the active zone (arrows = zones 1-6, sprint key = zone 7). " +
+             "Drives the player's watts and speed through RacerEnergy. NPCs ignore this.")]
+    [SerializeField] private RacerEffortInput effortInput;
+
     [SerializeField]
     private bool usePlayerEnergySystem = true;
 
@@ -168,14 +172,14 @@ public class RacerMotor : MonoBehaviour
         currentSidewaysOffset;
 
     public float WattsPercent =>
-        power != null
-            ? power.WattsPercent
-            : 0f;
+        ShouldUsePlayerEnergy()
+            ? energy.EffectiveWattsPercent
+            : power != null
+                ? power.WattsPercent
+                : 0f;
 
     public float NormalizedWatts =>
-        power != null
-            ? power.NormalizedWatts
-            : 0f;
+        GetMotorNormalizedWatts();
 
     public float LaneBias => laneBias;
     public bool IsSwimming => isSwimming;
@@ -231,6 +235,21 @@ public class RacerMotor : MonoBehaviour
                 GetComponent<RacerEnergy>();
         }
 
+        if (effortInput == null)
+        {
+            effortInput =
+                GetComponent<RacerEffortInput>();
+        }
+
+        if (ShouldUsePlayerEnergy() &&
+            effortInput == null)
+        {
+            Debug.LogWarning(
+                $"{name}: player uses RacerEnergy but has no RacerEffortInput. " +
+                "Zone and sprint input will not drive watts. Add RacerEffortInput to this " +
+                "GameObject or assign it in the RacerMotor inspector.");
+        }
+
         if (awareness == null)
         {
             awareness =
@@ -265,8 +284,8 @@ public class RacerMotor : MonoBehaviour
         UpdateSlope();
         UpdatePower();
         LatchDraftingWattsReduction();
-        UpdateSpeed();
         UpdateEnergy();
+        UpdateSpeed();
 
         if (!useExternalSpacingResolver)
         {
@@ -456,6 +475,20 @@ public class RacerMotor : MonoBehaviour
             energy != null;
     }
 
+    // The player's watts now come from the selected zone (via RacerEnergy), not RacerPower.
+    // NPCs keep using RacerPower exactly as before.
+    private float GetMotorNormalizedWatts()
+    {
+        if (ShouldUsePlayerEnergy())
+        {
+            return energy.EffectiveNormalizedWatts;
+        }
+
+        return power != null
+            ? power.NormalizedWatts
+            : 0f;
+    }
+
     private void UpdateSlope()
     {
         currentSlopePercent =
@@ -599,9 +632,7 @@ public class RacerMotor : MonoBehaviour
     private float CalculateTargetSpeed()
     {
         float normalizedWatts =
-            power != null
-                ? power.NormalizedWatts
-                : 0f;
+            GetMotorNormalizedWatts();
 
         float poweredFraction =
             Mathf.Pow(
@@ -670,10 +701,8 @@ public class RacerMotor : MonoBehaviour
             isDrafting = true;
         }
 
-        // Start with the rider's requested effort.
-        // Only lower it when another racer directly ahead is actively limiting road speed.
-        float speedLimitedEffort =
-            power.NormalizedWatts;
+        // How much a slower racer directly ahead is capping our road speed (1 = no cap).
+        float riderAheadLimit01 = 1f;
 
         if (maximumSpeed > 0f &&
             awareness != null &&
@@ -682,23 +711,32 @@ public class RacerMotor : MonoBehaviour
             awareness.DistanceToRacerAhead <=
             awareness.SpeedMatchingDistance)
         {
-            float riderAheadSpeedFraction =
+            riderAheadLimit01 =
                 Mathf.Clamp01(
                     awareness.RacerAhead.CurrentSpeed /
                     maximumSpeed);
-
-            speedLimitedEffort =
-                Mathf.Min(
-                    speedLimitedEffort,
-                    riderAheadSpeedFraction);
         }
 
-        energy.UpdateFromWatts(
-            power.NormalizedWatts,
-            isDrafting,
-            currentSlopePercent,
-            speedLimitedEffort,
-            draftingATPMultiplier);
+        // Player: the selected zone drives both watts and ATP. The cap above only bites
+        // when boxed in tight behind a slower rider, so it is passed as the speed limit.
+        if (effortInput != null)
+        {
+            energy.UpdateFromZone(
+                effortInput.CurrentZoneIndex,
+                isDrafting,
+                currentSlopePercent,
+                riderAheadLimit01);
+        }
+        else
+        {
+            // Fallback for a player with no RacerEffortInput assigned: old watts path.
+            energy.UpdateFromWatts(
+                power.NormalizedWatts,
+                isDrafting,
+                currentSlopePercent,
+                Mathf.Min(power.NormalizedWatts, riderAheadLimit01),
+                draftingATPMultiplier);
+        }
     }
 
     private void UpdateProgress()

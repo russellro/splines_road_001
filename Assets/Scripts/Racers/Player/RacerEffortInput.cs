@@ -56,6 +56,8 @@ public class RacerEffortInput : MonoBehaviour
         }
 
         IsSprinting = Keyboard.current.spaceKey.isPressed;
+
+        Debug.Log($"selected {selectedZoneIndex}, sprinting {IsSprinting}, sending {CurrentZoneIndex}");
     }
 
     public void ShiftUp()

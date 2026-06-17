@@ -578,6 +578,7 @@ public class RacerMotor : MonoBehaviour
         }
 
         targetSpeed = CalculateTargetSpeed();
+        targetSpeed = ApplyFollowSpeedLimit(targetSpeed);
 
         float speedChangeRate =
             currentSpeed <

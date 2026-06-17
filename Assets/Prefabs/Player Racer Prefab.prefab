@@ -129,6 +129,7 @@ GameObject:
   - component: {fileID: 6666804024138176981}
   - component: {fileID: 525771229129358253}
   - component: {fileID: 4965185395487076535}
+  - component: {fileID: 6984835143663070046}
   m_Layer: 0
   m_Name: Player Racer Prefab
   m_TagString: Untagged
@@ -257,7 +258,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RacerAwareness
   motor: {fileID: 0}
-  minimumFollowingDistance: 2
+  minimumFollowingDistance: 4
   speedMatchingDistance: 3.5
   draftingDistance: 8
   laneChangeClearance: 3
@@ -287,6 +288,21 @@ MonoBehaviour:
   wedgeWidth: 8
   pushCooldown: 0.25
   lastPush: None
+--- !u!114 &6984835143663070046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3683038308582918971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaf50a58889962c4bbbeed4060a3162e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RiderColor
+  teamColorMaterial: {fileID: 0}
+  color: {r: 0.5847869, g: 0.7732068, b: 0.8050314, a: 1}
+  colorProperty: _BaseColor
 --- !u!1001 &3409711894714163860
 PrefabInstance:
   m_ObjectHideFlags: 0

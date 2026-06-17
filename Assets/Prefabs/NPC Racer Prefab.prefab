@@ -222,8 +222,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RacerAwareness
   motor: {fileID: 0}
-  minimumFollowingDistance: 2
-  speedMatchingDistance: 3.5
+  minimumFollowingDistance: 4.5
+  speedMatchingDistance: 7
   draftingDistance: 8
   laneChangeClearance: 2.5
   swimmingClearanceMultiplier: 0.45

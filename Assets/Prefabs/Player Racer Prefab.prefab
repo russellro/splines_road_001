@@ -171,7 +171,7 @@ MonoBehaviour:
   track: {fileID: 0}
   power: {fileID: 0}
   energy: {fileID: 6666804024138176981}
-  effortInput: {fileID: 0}
+  effortInput: {fileID: 3375650507045930838}
   usePlayerEnergySystem: 1
   startingSpeed: 4
   maximumSpeed: 50
@@ -265,6 +265,7 @@ MonoBehaviour:
   startingZoneIndex: 1
   draftingDrainMultiplier: 0.548
   draftingRecoveryMultiplier: 1.25
+  draftingEffortMultiplier: 0.7
   uphillDrainMultiplierPerGradePercent: 0.035
   effortSmoothing: 0.15
 --- !u!114 &525771229129358253

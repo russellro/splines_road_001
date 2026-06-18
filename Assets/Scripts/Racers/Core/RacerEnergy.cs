@@ -68,6 +68,11 @@ public class RacerEnergy : MonoBehaviour
     [SerializeField, Min(1f)]
     private float draftingRecoveryMultiplier = 1.25f;
 
+    [Tooltip("While drafting, effort/watts eases to this fraction (0.7 = 30% less). " +
+             "The wheel ahead carries your speed, so you spend less to hold pace.")]
+    [SerializeField, Range(0.2f, 1f)]
+    private float draftingEffortMultiplier = 0.7f;
+
     [Header("Climbing")]
     [Tooltip("Extra drain per 1 percent of uphill grade, on drain zones only. 0.035 = +3.5% per 1%.")]
     [SerializeField, Min(0f)]
@@ -156,6 +161,13 @@ public class RacerEnergy : MonoBehaviour
                 requestedNormalizedWatts,
                 Mathf.Clamp01(speedLimit01));
 
+        // Drafting eases your effort: sitting on a wheel you hold pace at lower watts.
+        // Speed is carried by the wheel/follow logic, so easing here does not drop you.
+        if (isDrafting)
+        {
+            target *= draftingEffortMultiplier;
+        }
+
         effectiveNormalizedWatts =
             effortSmoothing > 0f
                 ? Mathf.SmoothDamp(
@@ -165,7 +177,9 @@ public class RacerEnergy : MonoBehaviour
                     effortSmoothing)
                 : target;
 
-        float rate = zone.atpPerSecond;
+        float metabolicEffort = Mathf.Clamp01(target);
+
+        float rate = GetATPRateFromEffectiveEffort(metabolicEffort);
 
         if (rate < 0f)
         {
@@ -194,7 +208,13 @@ public class RacerEnergy : MonoBehaviour
             RestoreATP(
                 regen * Time.deltaTime);
         }
-    }
+
+        Debug.Log(
+            $"Selected Zone: {zone.label}, " +
+            $"Displayed Watts: {EffectiveWattsPercent}%, " +
+            $"Metabolic Effort: {Mathf.RoundToInt(metabolicEffort * 100f)}%, " +
+            $"ATP Rate: {rate}");
+            }
 
     // Legacy shims: existing callers that pass a 0..1 watts value still compile and
     // run. The value is snapped to the nearest zone, then routed through UpdateFromZone.
@@ -245,6 +265,19 @@ public class RacerEnergy : MonoBehaviour
         }
 
         return best;
+    }
+
+    private float GetATPRateFromEffectiveEffort(float effort01)
+    {
+        if (ZoneCount == 0)
+        {
+            return 0f;
+        }
+
+        int effectiveZoneIndex =
+            ZoneIndexFromEffort(effort01);
+
+        return zones[effectiveZoneIndex].atpPerSecond;
     }
 
     public void RestoreATP(float amount)

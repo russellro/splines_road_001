@@ -9,8 +9,7 @@ public class KeyboardRacerInput : MonoBehaviour
     {
         if (motor == null)
         {
-            motor =
-                GetComponent<RacerMotor>();
+            motor = GetComponent<RacerMotor>();
         }
     }
 
@@ -22,32 +21,14 @@ public class KeyboardRacerInput : MonoBehaviour
             return;
         }
 
-        bool qIsHeld =
-            Keyboard.current.qKey.isPressed;
-
-        // Q is reserved as the directional-push modifier.
-        // The push component handles Q + arrow-key combinations.
-        if (qIsHeld)
+        // Q is reserved for the directional push system.
+        // PlayerPelotonDirectionalPush handles Q + arrows.
+        if (Keyboard.current.qKey.isPressed)
         {
-            motor.SetThrottle(0f);
             return;
         }
 
-        float wattsAdjustment = 0f;
-
-        if (Keyboard.current.upArrowKey.isPressed)
-        {
-            wattsAdjustment += 1f;
-        }
-
-        if (Keyboard.current.downArrowKey.isPressed)
-        {
-            wattsAdjustment -= 1f;
-        }
-
-        motor.SetThrottle(
-            wattsAdjustment);
-
+        // Left/right still change lanes.
         if (Keyboard.current.leftArrowKey.wasPressedThisFrame)
         {
             motor.ChangeLane(-1);
@@ -57,5 +38,9 @@ public class KeyboardRacerInput : MonoBehaviour
         {
             motor.ChangeLane(1);
         }
+
+        // IMPORTANT:
+        // Do not read up/down here anymore.
+        // Up/down now belong to RacerEffortInput for zone changes.
     }
 }

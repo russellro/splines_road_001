@@ -57,22 +57,49 @@ public class RacerEffortInput : MonoBehaviour
 
         IsSprinting = Keyboard.current.spaceKey.isPressed;
 
-        Debug.Log($"selected {selectedZoneIndex}, sprinting {IsSprinting}, sending {CurrentZoneIndex}");
     }
 
     public void ShiftUp()
     {
+        int oldZone = selectedZoneIndex;
+
         selectedZoneIndex =
             Mathf.Min(
                 selectedZoneIndex + 1,
                 Mathf.Max(0, arrowZoneCount - 1));
+
+        if (selectedZoneIndex != oldZone)
+        {
+            Debug.Log($"Zone changed to {selectedZoneIndex + 1}");
+        }
     }
 
     public void ShiftDown()
     {
+        int oldZone = selectedZoneIndex;
+
         selectedZoneIndex =
             Mathf.Max(
                 selectedZoneIndex - 1,
                 0);
+
+        if (selectedZoneIndex != oldZone)
+        {
+            Debug.Log($"Zone changed to {selectedZoneIndex + 1}");
+        }
+    }
+
+    public void ForceSelectedZoneIndex(int zoneIndex)
+    {
+        selectedZoneIndex =
+            Mathf.Clamp(
+                zoneIndex,
+                0,
+                6);
+
+        // Optional, but useful:
+        // If the player was holding sprint while boxed in,
+        // do not let sprint stay secretly armed.
+        IsSprinting = false;
     }
 }

@@ -717,12 +717,22 @@ public class RacerMotor : MonoBehaviour
                     maximumSpeed);
         }
 
-        // Player: the selected zone drives both watts and ATP. The cap above only bites
-        // when boxed in tight behind a slower rider, so it is passed as the speed limit.
         if (effortInput != null)
         {
+            int zoneIndexToUse =
+                effortInput.CurrentZoneIndex;
+
+            if (ShouldSyncPlayerZoneToRiderAhead())
+            {
+                zoneIndexToUse =
+                    GetRiderAheadZoneIndex();
+
+                effortInput.ForceSelectedZoneIndex(
+                    zoneIndexToUse);
+            }
+
             energy.UpdateFromZone(
-                effortInput.CurrentZoneIndex,
+                zoneIndexToUse,
                 isDrafting,
                 currentSlopePercent,
                 riderAheadLimit01);
@@ -737,6 +747,63 @@ public class RacerMotor : MonoBehaviour
                 Mathf.Min(power.NormalizedWatts, riderAheadLimit01),
                 draftingATPMultiplier);
         }
+    }
+
+    private bool ShouldSyncPlayerZoneToRiderAhead()
+    {
+        return awareness != null &&
+            awareness.HasRacerAhead &&
+            awareness.RacerAhead != null &&
+            awareness.DistanceToRacerAhead <= awareness.SpeedMatchingDistance;
+    }
+
+    private int GetRiderAheadZoneIndex()
+    {
+        if (awareness == null ||
+            awareness.RacerAhead == null ||
+            energy == null)
+        {
+            return 0;
+        }
+
+        RacerMotor riderAhead =
+            awareness.RacerAhead;
+
+        RacerEnergy riderAheadEnergy =
+            riderAhead.GetComponent<RacerEnergy>();
+
+        int maxZone =
+            Mathf.Max(0, energy.ZoneCount - 1);
+
+        // If the rider ahead has RacerEnergy, use their actual current zone.
+        if (riderAheadEnergy != null &&
+            riderAheadEnergy.ZoneCount > 0)
+        {
+            return Mathf.Clamp(
+                riderAheadEnergy.CurrentZoneIndex,
+                0,
+                maxZone);
+        }
+
+        // NPCs usually use RacerPower instead of RacerEnergy.
+        // Convert their current effort into the closest player zone.
+        float riderAheadEffort =
+            riderAhead.NormalizedWatts;
+
+        // Fallback in case the NPC is being moved by direct speed control.
+        if (riderAheadEffort <= 0.01f &&
+            riderAhead.MaximumSpeed > 0f)
+        {
+            riderAheadEffort =
+                Mathf.Clamp01(
+                    riderAhead.CurrentSpeed /
+                    riderAhead.MaximumSpeed);
+        }
+
+        return Mathf.Clamp(
+            energy.ZoneIndexFromEffort(riderAheadEffort),
+            0,
+            maxZone);
     }
 
     private void UpdateProgress()

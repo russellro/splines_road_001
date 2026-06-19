@@ -766,38 +766,38 @@ public class RacerMotor : MonoBehaviour
             return 0;
         }
 
-        RacerMotor riderAhead =
-            awareness.RacerAhead;
+        RacerMotor riderAhead = awareness.RacerAhead;
+        int maxZone = Mathf.Max(0, energy.ZoneCount - 1);
 
-        RacerEnergy riderAheadEnergy =
-            riderAhead.GetComponent<RacerEnergy>();
+        // Most important change:
+        // Use the rider ahead's ACTUAL road speed first,
+        // not their requested watts/power state.
+        float riderAheadEffort = 0f;
 
-        int maxZone =
-            Mathf.Max(0, energy.ZoneCount - 1);
-
-        // If the rider ahead has RacerEnergy, use their actual current zone.
-        if (riderAheadEnergy != null &&
-            riderAheadEnergy.ZoneCount > 0)
+        if (riderAhead.MaximumSpeed > 0f)
         {
-            return Mathf.Clamp(
-                riderAheadEnergy.CurrentZoneIndex,
-                0,
-                maxZone);
+            riderAheadEffort = Mathf.Clamp01(
+                riderAhead.CurrentSpeed / riderAhead.MaximumSpeed);
         }
 
-        // NPCs usually use RacerPower instead of RacerEnergy.
-        // Convert their current effort into the closest player zone.
-        float riderAheadEffort =
-            riderAhead.NormalizedWatts;
-
-        // Fallback in case the NPC is being moved by direct speed control.
-        if (riderAheadEffort <= 0.01f &&
-            riderAhead.MaximumSpeed > 0f)
+        // Fallback only if the rider is basically stopped.
+        // This prevents everyone from becoming Recover on the starting grid.
+        if (riderAheadEffort <= 0.01f)
         {
-            riderAheadEffort =
-                Mathf.Clamp01(
-                    riderAhead.CurrentSpeed /
-                    riderAhead.MaximumSpeed);
+            RacerEnergy riderAheadEnergy =
+                riderAhead.GetComponent<RacerEnergy>();
+
+            if (riderAheadEnergy != null &&
+                riderAheadEnergy.ZoneCount > 0)
+            {
+                riderAheadEffort =
+                    riderAheadEnergy.EffectiveNormalizedWatts;
+            }
+            else
+            {
+                riderAheadEffort =
+                    riderAhead.NormalizedWatts;
+            }
         }
 
         return Mathf.Clamp(

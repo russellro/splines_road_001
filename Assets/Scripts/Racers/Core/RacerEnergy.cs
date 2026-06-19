@@ -79,8 +79,8 @@ public class RacerEnergy : MonoBehaviour
     private float uphillDrainMultiplierPerGradePercent = 0.035f;
 
     [Header("Speed Feel")]
-    [Tooltip("Seconds for effective watts to glide between zones. Affects speed and the HUD only, " +
-             "NOT the bucket (the bucket always uses the selected zone's discrete rate). 0 = instant.")]
+    [Tooltip("Seconds for effective watts to glide between zones. Affects speed and HUD feel. " +
+    "The ATP bucket uses the actual effective zone after drafting and speed limits. 0 = instant.")]
     [SerializeField, Min(0f)]
     private float effortSmoothing = 0.15f;
 
@@ -113,6 +113,7 @@ public class RacerEnergy : MonoBehaviour
     public float RequestedNormalizedWatts => requestedNormalizedWatts;
     public float EffectiveNormalizedWatts => effectiveNormalizedWatts;
     public int EffectiveWattsPercent => Mathf.RoundToInt(effectiveNormalizedWatts * 100f);
+
 
     private void Awake()
     {
@@ -179,7 +180,14 @@ public class RacerEnergy : MonoBehaviour
 
         float metabolicEffort = Mathf.Clamp01(target);
 
-        float rate = GetATPRateFromEffectiveEffort(metabolicEffort);
+        // Convert the actual effort into the actual zone.
+        int effectiveZoneIndex = ZoneIndexFromEffort(metabolicEffort);
+        EnergyZone effectiveZone = zones[effectiveZoneIndex];
+
+        // Make the public/current zone match what the rider is really doing.
+        currentZoneIndex = effectiveZoneIndex;
+
+        float rate = effectiveZone.atpPerSecond;
 
         if (rate < 0f)
         {
@@ -210,11 +218,12 @@ public class RacerEnergy : MonoBehaviour
         }
 
         Debug.Log(
-            $"Selected Zone: {zone.label}, " +
-            $"Displayed Watts: {EffectiveWattsPercent}%, " +
-            $"Metabolic Effort: {Mathf.RoundToInt(metabolicEffort * 100f)}%, " +
-            $"ATP Rate: {rate}");
-            }
+     $"Requested Zone: {zone.label}, " +
+     $"Actual Zone: {effectiveZone.label}, " +
+     $"Displayed Watts: {EffectiveWattsPercent}%, " +
+     $"Metabolic Effort: {Mathf.RoundToInt(metabolicEffort * 100f)}%, " +
+     $"ATP Rate: {rate}");
+    }
 
     // Legacy shims: existing callers that pass a 0..1 watts value still compile and
     // run. The value is snapped to the nearest zone, then routed through UpdateFromZone.

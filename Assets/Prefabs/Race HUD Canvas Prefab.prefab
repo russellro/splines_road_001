@@ -476,7 +476,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1706, y: -773}
+  m_AnchoredPosition: {x: 1706, y: -577}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2549069131876432296
@@ -685,6 +685,7 @@ GameObject:
   m_Component:
   - component: {fileID: 113784704972807540}
   - component: {fileID: 2361899949882493304}
+  - component: {fileID: 1227654936263138348}
   m_Layer: 5
   m_Name: ATP Bucket
   m_TagString: Untagged
@@ -708,7 +709,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 698, y: -358}
+  m_AnchoredPosition: {x: 614, y: -251}
   m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2361899949882493304
@@ -731,10 +732,30 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 2
   m_StartAxis: 0
-  m_CellSize: {x: 10, y: 10}
+  m_CellSize: {x: 17.4, y: 17.4}
   m_Spacing: {x: 2, y: 2}
   m_Constraint: 1
   m_ConstraintCount: 10
+--- !u!114 &1227654936263138348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4791628591921157313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 192
+  m_PreferredHeight: 192
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &5941832280739101407
 GameObject:
   m_ObjectHideFlags: 0
@@ -1215,6 +1236,7 @@ GameObject:
   - component: {fileID: 5128575075775627202}
   - component: {fileID: 3520658718484215012}
   - component: {fileID: 1392236867857856369}
+  - component: {fileID: 4996574225447155860}
   m_Layer: 5
   m_Name: EffortZoneBand
   m_TagString: Untagged
@@ -1245,7 +1267,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 503, y: -309}
+  m_AnchoredPosition: {x: 649, y: -157}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2240358799799413571
@@ -1358,6 +1380,26 @@ MonoBehaviour:
   zone5Color: {r: 1, g: 0.6, b: 0.1, a: 1}
   zone6Color: {r: 0.95, g: 0.2, b: 0.15, a: 1}
   zone7Color: {r: 1, g: 0, b: 0.6, a: 1}
+--- !u!114 &4996574225447155860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7030301319244004311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 192
+  m_PreferredHeight: 24
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &7142903696155369745
 GameObject:
   m_ObjectHideFlags: 0

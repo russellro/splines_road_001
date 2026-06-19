@@ -719,16 +719,18 @@ public class RacerMotor : MonoBehaviour
 
         if (effortInput != null)
         {
-            int zoneIndexToUse =
-                effortInput.CurrentZoneIndex;
+            if (effortInput.IsCoasting)
+            {
+                energy.UpdateCoasting(isDrafting);
+                return;
+            }
+
+            int zoneIndexToUse = effortInput.CurrentZoneIndex;
 
             if (ShouldSyncPlayerZoneToRiderAhead())
             {
-                zoneIndexToUse =
-                    GetRiderAheadZoneIndex();
-
-                effortInput.ForceSelectedZoneIndex(
-                    zoneIndexToUse);
+                zoneIndexToUse = GetRiderAheadZoneIndex();
+                effortInput.ForceSelectedZoneIndex(zoneIndexToUse);
             }
 
             energy.UpdateFromZone(

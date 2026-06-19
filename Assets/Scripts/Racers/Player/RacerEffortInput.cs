@@ -25,6 +25,7 @@ public class RacerEffortInput : MonoBehaviour
 
     public int SelectedZoneIndex => selectedZoneIndex;
     public bool IsSprinting { get; private set; }
+    public bool IsCoasting { get; private set; }
 
     public int CurrentZoneIndex =>
         IsSprinting ? sprintZoneIndex : selectedZoneIndex;
@@ -45,6 +46,8 @@ public class RacerEffortInput : MonoBehaviour
             return;
         }
 
+        IsCoasting = Keyboard.current.wKey.isPressed;
+
         if (Keyboard.current.upArrowKey.wasPressedThisFrame)
         {
             ShiftUp();
@@ -55,8 +58,7 @@ public class RacerEffortInput : MonoBehaviour
             ShiftDown();
         }
 
-        IsSprinting = Keyboard.current.spaceKey.isPressed;
-
+        IsSprinting = Keyboard.current.spaceKey.isPressed && !IsCoasting;
     }
 
     public void ShiftUp()

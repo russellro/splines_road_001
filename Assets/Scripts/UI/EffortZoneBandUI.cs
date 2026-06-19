@@ -135,6 +135,12 @@ public class EffortZoneBandUI : MonoBehaviour
         if (zoneSquares == null || zoneSquares.Length == 0)
             return;
 
+        if (energy.IsCoasting || energy.CurrentZoneIndex < 0)
+        {
+            SetAllSquaresInactive();
+            return;
+        }
+
         int currentZone = Mathf.Clamp(
             energy.CurrentZoneIndex,
             0,
@@ -152,6 +158,20 @@ public class EffortZoneBandUI : MonoBehaviour
             zoneSquares[i].color = lit
                 ? zoneColors[Mathf.Min(i, zoneColors.Length - 1)]
                 : inactiveColor;
+        }
+    }
+
+    private void SetAllSquaresInactive()
+    {
+        if (zoneSquares == null)
+            return;
+
+        for (int i = 0; i < zoneSquares.Length; i++)
+        {
+            if (zoneSquares[i] == null)
+                continue;
+
+            zoneSquares[i].color = inactiveColor;
         }
     }
 }

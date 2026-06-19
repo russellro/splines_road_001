@@ -81,6 +81,9 @@ public class RacerEnergy : MonoBehaviour
     [Header("Speed Feel")]
     [Tooltip("Seconds for effective watts to glide between zones. Affects speed and HUD feel. " +
     "The ATP bucket uses the actual effective zone after drafting and speed limits. 0 = instant.")]
+
+    [Header("Coasting")]
+    [SerializeField, Min(0f)] private float coastingATPPerSecond = 12f;
     [SerializeField, Min(0f)]
     private float effortSmoothing = 0.15f;
 
@@ -90,6 +93,7 @@ public class RacerEnergy : MonoBehaviour
     private float requestedNormalizedWatts;
     private float effectiveNormalizedWatts;
     private float effortVelocity;
+    private bool isCoasting;
 
     public float CurrentATP => currentATP;
     public float MaximumATP => maximumATP;
@@ -101,14 +105,18 @@ public class RacerEnergy : MonoBehaviour
     public bool IsBonked => hasBonked;
     public bool HasBonked => hasBonked;
 
+    public bool IsCoasting => isCoasting;
+
     public int ZoneCount => zones != null ? zones.Length : 0;
-    public int CurrentZoneIndex => currentZoneIndex;
-    public int CurrentZoneNumber => currentZoneIndex + 1;
+    public int CurrentZoneIndex => isCoasting ? -1 : currentZoneIndex;
+    public int CurrentZoneNumber => isCoasting ? 0 : currentZoneIndex + 1;
 
     public string CurrentZoneLabel =>
-        ZoneCount == 0
-            ? string.Empty
-            : zones[Mathf.Clamp(currentZoneIndex, 0, zones.Length - 1)].label;
+        isCoasting
+            ? "Coast"
+            : ZoneCount == 0
+                ? string.Empty
+                : zones[Mathf.Clamp(currentZoneIndex, 0, zones.Length - 1)].label;
 
     public float RequestedNormalizedWatts => requestedNormalizedWatts;
     public float EffectiveNormalizedWatts => effectiveNormalizedWatts;
@@ -134,6 +142,7 @@ public class RacerEnergy : MonoBehaviour
         requestedNormalizedWatts = 0f;
         effectiveNormalizedWatts = 0f;
         effortVelocity = 0f;
+        isCoasting = false;
     }
 
     // Preferred entry point. RacerEffortInput selects the zone index; the motor
@@ -148,6 +157,8 @@ public class RacerEnergy : MonoBehaviour
         {
             return;
         }
+
+        isCoasting = false;
 
         currentZoneIndex =
             Mathf.Clamp(zoneIndex, 0, zones.Length - 1);
@@ -330,5 +341,29 @@ public class RacerEnergy : MonoBehaviour
         {
             hasBonked = true;
         }
+    }
+
+    public void UpdateCoasting(bool isDrafting)
+    {
+        isCoasting = true;
+
+        requestedNormalizedWatts = 0f;
+
+        effectiveNormalizedWatts = effortSmoothing > 0f
+            ? Mathf.SmoothDamp(
+                effectiveNormalizedWatts,
+                0f,
+                ref effortVelocity,
+                effortSmoothing)
+            : 0f;
+
+        float regen = coastingATPPerSecond;
+
+        if (isDrafting)
+        {
+            regen *= draftingRecoveryMultiplier;
+        }
+
+        RestoreATP(regen * Time.deltaTime);
     }
 }
